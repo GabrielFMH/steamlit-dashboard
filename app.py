@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import seaborn as sns
 import plotly.express as px
 
 # Configuración de la página
@@ -50,27 +49,29 @@ col1.metric("Ventas Totales", f"${total_ventas:,.0f}")
 col2.metric("Venta Promedio", f"${ventas_promedio:,.2f}")
 col3.metric("Venta Máxima", f"${ventas_maximas:,.0f}")
 
-# Gráfico de barras - Ventas por región usando Seaborn
+# Gráfico de barras - Ventas por región usando Plotly
 st.write("### Ventas por Región")
-fig1 = sns.barplot(x='Región', y='Ventas', data=df_filtrado, estimator=np.sum, ci=None, palette="coolwarm")
-fig1.set_title("Total de Ventas por Región")
-fig1.set_xlabel("Región")
-fig1.set_ylabel("Total de Ventas")
-st.pyplot(fig1.figure)  # Usa el objeto `figure` para mostrar con `st.pyplot`
+fig1 = px.bar(df_filtrado.groupby('Región').sum(numeric_only=True).reset_index(),
+              x='Región', y='Ventas', 
+              title='Total de Ventas por Región',
+              labels={'Ventas': 'Total de Ventas'},
+              color='Región',
+              color_discrete_sequence=px.colors.qualitative.Plotly)
+st.plotly_chart(fig1)
 
 # Gráfico de líneas - Ventas a lo largo del tiempo usando Plotly
 st.write("### Ventas a lo Largo del Tiempo")
-df_tiempo = df_filtrado.groupby('Fecha').sum().reset_index()
+df_tiempo = df_filtrado.groupby('Fecha').sum(numeric_only=True).reset_index()
 fig2 = px.line(df_tiempo, x='Fecha', y='Ventas', title='Tendencia de Ventas Diarias')
 st.plotly_chart(fig2)
 
-# Gráfico de dispersión - Ventas por producto usando Seaborn
+# Gráfico de dispersión - Ventas por producto usando Plotly
 st.write("### Ventas por Producto")
-fig3 = sns.scatterplot(x='Producto', y='Ventas', data=df_filtrado, hue='Región', palette='Set1', s=100)
-fig3.set_title("Ventas por Producto")
-fig3.set_xlabel("Producto")
-fig3.set_ylabel("Ventas")
-st.pyplot(fig3.figure)  # Usa el objeto `figure` para mostrar con `st.pyplot`
+fig3 = px.scatter(df_filtrado, x='Producto', y='Ventas', color='Región',
+                  title='Ventas por Producto', 
+                  labels={'Ventas': 'Ventas'},
+                  color_discrete_sequence=px.colors.qualitative.Set1)
+st.plotly_chart(fig3)
 
 # Gráfico de mapa - Ventas por región (Mapa de calor) usando Plotly
 st.write("### Mapa de Ventas por Región")
