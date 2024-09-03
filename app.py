@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 
@@ -51,32 +50,29 @@ col1.metric("Ventas Totales", f"${total_ventas:,.0f}")
 col2.metric("Venta Promedio", f"${ventas_promedio:,.2f}")
 col3.metric("Venta Máxima", f"${ventas_maximas:,.0f}")
 
-# Gráfico de barras - Ventas por región
+# Gráfico de barras - Ventas por región usando Seaborn
 st.write("### Ventas por Región")
-fig1, ax1 = plt.subplots()
-sns.barplot(x='Región', y='Ventas', data=df_filtrado, estimator=np.sum, ci=None, ax=ax1, palette="coolwarm")
-plt.title("Total de Ventas por Región")
-plt.xlabel("Región")
-plt.ylabel("Total de Ventas")
-st.pyplot(fig1)
+fig1 = sns.barplot(x='Región', y='Ventas', data=df_filtrado, estimator=np.sum, ci=None, palette="coolwarm")
+fig1.set_title("Total de Ventas por Región")
+fig1.set_xlabel("Región")
+fig1.set_ylabel("Total de Ventas")
+st.pyplot(fig1.figure)  # Usa el objeto `figure` para mostrar con `st.pyplot`
 
-# Gráfico de líneas - Ventas a lo largo del tiempo
+# Gráfico de líneas - Ventas a lo largo del tiempo usando Plotly
 st.write("### Ventas a lo Largo del Tiempo")
 df_tiempo = df_filtrado.groupby('Fecha').sum().reset_index()
 fig2 = px.line(df_tiempo, x='Fecha', y='Ventas', title='Tendencia de Ventas Diarias')
 st.plotly_chart(fig2)
 
-# Gráfico de dispersión - Ventas por producto
+# Gráfico de dispersión - Ventas por producto usando Seaborn
 st.write("### Ventas por Producto")
-fig3, ax3 = plt.subplots()
-sns.scatterplot(x='Producto', y='Ventas', data=df_filtrado, ax=ax3, hue='Región', palette='Set1', s=100)
-plt.title("Ventas por Producto")
-plt.xlabel("Producto")
-plt.ylabel("Ventas")
-st.pyplot(fig3)
+fig3 = sns.scatterplot(x='Producto', y='Ventas', data=df_filtrado, hue='Región', palette='Set1', s=100)
+fig3.set_title("Ventas por Producto")
+fig3.set_xlabel("Producto")
+fig3.set_ylabel("Ventas")
+st.pyplot(fig3.figure)  # Usa el objeto `figure` para mostrar con `st.pyplot`
 
-
-# Gráfico de mapa - Ventas por región (Mapa de calor)
+# Gráfico de mapa - Ventas por región (Mapa de calor) usando Plotly
 st.write("### Mapa de Ventas por Región")
 df_mapa = df_filtrado.groupby('Región').sum(numeric_only=True).reset_index()
 fig4 = px.choropleth(df_mapa, 
@@ -88,7 +84,6 @@ fig4 = px.choropleth(df_mapa,
                      title="Ventas por Región (Mapa de Calor)",
                      color_continuous_scale='Viridis')
 st.plotly_chart(fig4)
-
 
 # Tabla de detalles
 st.write("### Detalles de Ventas")
