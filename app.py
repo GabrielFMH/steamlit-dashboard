@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
 
 # Configuración de la página
 st.set_page_config(
@@ -49,42 +48,20 @@ col1.metric("Ventas Totales", f"${total_ventas:,.0f}")
 col2.metric("Venta Promedio", f"${ventas_promedio:,.2f}")
 col3.metric("Venta Máxima", f"${ventas_maximas:,.0f}")
 
-# Gráfico de barras - Ventas por región usando Plotly
+# Gráfico de barras - Ventas por región usando Streamlit
 st.write("### Ventas por Región")
-fig1 = px.bar(df_filtrado.groupby('Región').sum(numeric_only=True).reset_index(),
-              x='Región', y='Ventas', 
-              title='Total de Ventas por Región',
-              labels={'Ventas': 'Total de Ventas'},
-              color='Región',
-              color_discrete_sequence=px.colors.qualitative.Plotly)
-st.plotly_chart(fig1)
+df_region = df_filtrado.groupby('Región').sum().reset_index()
+st.bar_chart(df_region.set_index('Región')['Ventas'])
 
-# Gráfico de líneas - Ventas a lo largo del tiempo usando Plotly
+# Gráfico de líneas - Ventas a lo largo del tiempo usando Streamlit
 st.write("### Ventas a lo Largo del Tiempo")
-df_tiempo = df_filtrado.groupby('Fecha').sum(numeric_only=True).reset_index()
-fig2 = px.line(df_tiempo, x='Fecha', y='Ventas', title='Tendencia de Ventas Diarias')
-st.plotly_chart(fig2)
+df_tiempo = df_filtrado.groupby('Fecha').sum().reset_index()
+st.line_chart(df_tiempo.set_index('Fecha')['Ventas'])
 
-# Gráfico de dispersión - Ventas por producto usando Plotly
+# Gráfico de dispersión - Ventas por producto usando Streamlit
 st.write("### Ventas por Producto")
-fig3 = px.scatter(df_filtrado, x='Producto', y='Ventas', color='Región',
-                  title='Ventas por Producto', 
-                  labels={'Ventas': 'Ventas'},
-                  color_discrete_sequence=px.colors.qualitative.Set1)
-st.plotly_chart(fig3)
-
-# Gráfico de mapa - Ventas por región (Mapa de calor) usando Plotly
-st.write("### Mapa de Ventas por Región")
-df_mapa = df_filtrado.groupby('Región').sum(numeric_only=True).reset_index()
-fig4 = px.choropleth(df_mapa, 
-                     locations='Región', 
-                     locationmode='geojson-id',
-                     geojson='https://raw.githubusercontent.com/johan/world.geo.json/master/countries/USA/regions.geo.json',
-                     color='Ventas', 
-                     scope='usa',
-                     title="Ventas por Región (Mapa de Calor)",
-                     color_continuous_scale='Viridis')
-st.plotly_chart(fig4)
+df_producto = df_filtrado.groupby(['Producto', 'Región']).sum().reset_index()
+st.scatter_chart(df_producto, x='Producto', y='Ventas', color='Región')
 
 # Tabla de detalles
 st.write("### Detalles de Ventas")
