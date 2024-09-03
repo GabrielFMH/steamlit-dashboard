@@ -50,18 +50,19 @@ col3.metric("Venta Máxima", f"${ventas_maximas:,.0f}")
 
 # Gráfico de barras - Ventas por región usando Streamlit
 st.write("### Ventas por Región")
-df_region = df_filtrado.groupby('Región').sum().reset_index()
+df_region = df_filtrado.groupby('Región')['Ventas'].sum().reset_index()
 st.bar_chart(df_region.set_index('Región')['Ventas'])
 
 # Gráfico de líneas - Ventas a lo largo del tiempo usando Streamlit
 st.write("### Ventas a lo Largo del Tiempo")
-df_tiempo = df_filtrado.groupby('Fecha').sum().reset_index()
+df_tiempo = df_filtrado.groupby('Fecha')['Ventas'].sum().reset_index()
 st.line_chart(df_tiempo.set_index('Fecha')['Ventas'])
 
 # Gráfico de dispersión - Ventas por producto usando Streamlit
 st.write("### Ventas por Producto")
-df_producto = df_filtrado.groupby(['Producto', 'Región']).sum().reset_index()
-st.scatter_chart(df_producto, x='Producto', y='Ventas', color='Región')
+df_producto = df_filtrado.groupby(['Producto', 'Región'])['Ventas'].sum().reset_index()
+st.write("Nota: El gráfico de dispersión en Streamlit no es tan flexible. Este es un gráfico de datos tabulados.")
+st.dataframe(df_producto.pivot(index='Producto', columns='Región', values='Ventas'))
 
 # Tabla de detalles
 st.write("### Detalles de Ventas")
